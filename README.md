@@ -10,7 +10,7 @@
 
 <br/>
 
-![Portfolio Preview](https://via.placeholder.com/900x450/1a1a2e/ffffff?text=Your+Portfolio+Screenshot+Here)
+![Portfolio Preview](assets/images/Screenshot 2026-05-23 233227.jpg)
 
 > *"Replace this with your favorite quote or your personal tagline."*
 
@@ -28,6 +28,7 @@
 - [Getting Started](#-getting-started)
 - [Folder Structure](#-folder-structure)
 - [Screenshots](#-screenshots)
+- [Resume](#-resume)
 - [Contact](#-contact)
 - [License](#-license)
 
@@ -126,11 +127,16 @@ my-portfolio/
 
 | Desktop View | Mobile View |
 |:---:|:---:|
-| ![Desktop](https://via.placeholder.com/400x250/1a1a2e/ffffff?text=Desktop+View) | ![Mobile](https://via.placeholder.com/200x350/1a1a2e/ffffff?text=Mobile+View) |
+| ![Desktop](assets/images/Screenshot 2026-05-23 233227.jpg) | ![Mobile](assets/images/WhatsApp Image 2026-05-23 at 11.51.05 PM.jpeg) |
 
 </div>
 
 > 💡 **Tip:** Replace the placeholder images above with real screenshots of your portfolio!
+
+---
+
+## 📄 Resume
+[![Download Resume](https://img.shields.io/badge/Download-Resume_PDF-blue?style=for-the-badge&logo=adobeacrobatreader)](assets/resume.pdf)
 
 ---
 
