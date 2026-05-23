@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<!-- Declares this is an HTML5 document. Tells the browser to parse it using modern standards. -->
+
+<html lang="en">
+<!-- Root element of the page. lang="en" tells browsers & screen readers the page is in English. -->
+
+<head>
+<!-- Contains metadata (info about the page), not visible content. -->
+
+  <meta charset="UTF-8"/>
+  <!-- Sets character encoding to UTF-8, which supports all unicode characters (emojis, accents, etc.). -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Makes the page responsive. width=device-width means match the screen width.
+       initial-scale=1.0 means no zoom on load. Without this, mobile browsers would zoom out. -->
+
+  <title>Akshat Jain — Portfolio</title>
+  <!-- Text shown on the browser tab and in search engine results. -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Syne+Mono&display=swap" rel="stylesheet"/>
+  <!-- Imports two Google Fonts:
+       - Syne (weights 400/600/700/800) — used for headings and body text.
+       - Syne Mono — a monospace variant used for labels and code-style text.
+       display=swap means text shows immediately in a fallback font while the custom one loads. -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Loads Three.js (version r128) from a CDN.
+       Three.js is a 3D graphics library that powers the animated background, particles, and 3D shapes. -->
+
+  <link rel="stylesheet" href="styles.css"/>
+  <!-- Links the external CSS file (styles.css) which controls all visual styling. -->
+
+</head>
+
+<body>
+<!-- Everything inside here is visible to the user. -->
+
+  <!-- ═══════════════════════════════════════════════
+       CUSTOM CURSOR
+       Two layered divs replace the default mouse cursor.
+       #cur  → the small dot that follows the mouse exactly.
+       #cur-r → the larger ring that lags slightly behind (smooth trailing effect). -->
+  <div id="cur"></div>
+  <div id="cur-r"></div>
+
+  <!-- ═══════════════════════════════════════════════
+       THREE.JS CANVAS (3D Background)
+       This <canvas> is the drawing surface for Three.js.
+       It is fixed behind all content (z-index:0 in CSS) and covers the full screen. -->
+  <canvas id="bg"></canvas>
+
+  <!-- ═══════════════════════════════════════════════
+       LOADER / SPLASH SCREEN
+       Covers the page while it loads. JavaScript removes the .out class after 1.1s,
+       which triggers a CSS fade-out transition. -->
+  <div id="ldr">
+    <div class="ldr-ring"></div>       <!-- Spinning ring animation (CSS-only) -->
+    <div class="ldr-name">Akshat Jain</div>  <!-- Name shown in faint text during load -->
+    <div class="ldr-txt">Loading Portfolio</div>  <!-- Blinking status text -->
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       NAVIGATION BAR
+       Fixed at the top. Contains logo (links back to hero section) and nav links. -->
+  <nav>
+    <a class="nav-logo" href="#hero">AJ_</a>
+    <!-- Logo — clicking scrolls back to the hero section. The underscore gives a terminal/code feel. -->
+
+    <ul class="nav-links">
+      <!-- Unordered list of navigation anchor links. Each href="#id" scrolls to that section. -->
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#certs">Certifications</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════
+       HERO SECTION
+       The full-screen introduction area. Uses flexbox to vertically center content.
+       min-height:100vh ensures it fills the viewport. -->
+  <section id="hero">
+    <div class="hero-inner rev">
+      <!-- .rev = starts invisible (opacity:0), becomes visible when JavaScript adds .vis class -->
+
+      <div class="hero-badge">
+        <!-- Small pill-shaped badge at the top, with a pulsing dot to signal availability. -->
+        <div class="pulse"></div>Open to internships &amp; opportunities
+        <!-- &amp; is the HTML entity for "&" — required because & has special meaning in HTML. -->
+      </div>
+
+      <h1 class="hero-name">
+        AKSHAT<br>
+        <!-- <br> forces a line break so JAIN appears on its own line. -->
+        <span class="c">JAIN.</span>
+        <!-- .c applies the cyan color + glow text-shadow to just "JAIN." -->
+      </h1>
+
+      <p class="hero-role">
+        CS Student <span>/</span> Developer <span>/</span> Cybersecurity Enthusiast
+        <!-- Each "/" separator is wrapped in <span> so it can be styled (cyan color) separately. -->
+      </p>
+
+      <p class="hero-desc">
+        <!-- Short bio paragraph. Styled with muted color and wider line-height for readability. -->
+        Computer Science undergraduate at SVIIT, Indore. Passionate about building secure,
+        cloud-native solutions and exploring the frontiers of AI, cybersecurity, and design thinking.
+      </p>
+
+      <!-- Stats Row: three quick-glance numbers -->
+      <div class="hero-stats">
+        <div>
+          <div class="hstat-n">11</div>        <!-- Large cyan number -->
+          <div class="hstat-l">Certifications</div>  <!-- Small mono label below it -->
+        </div>
+        <div>
+          <div class="hstat-n">6</div>
+          <div class="hstat-l">GitHub Repos</div>
+        </div>
+        <div>
+          <div class="hstat-n">6+</div>
+          <div class="hstat-l">Skill Areas</div>
+        </div>
+      </div>
+
+      <!-- Call-to-Action Buttons -->
+      <div class="hero-ctas">
+        <a href="#contact" class="btn btn-glow">Get in Touch ↗</a>
+        <!-- btn-glow = filled cyan button with glow effect. ↗ arrow indicates an action. -->
+        <a href="#certs" class="btn btn-ghost">View Certs</a>
+        <!-- btn-ghost = transparent bordered button — secondary action style. -->
+      </div>
+    </div>
+
+    <!-- Scroll hint at bottom-left of hero section — animated line + label -->
+    <div class="scroll-hint">
+      <div class="s-line-anim"></div>  <!-- Animated expanding/contracting line -->
+      Scroll to explore
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SKILLS SECTION
+       Displays skill cards in a responsive auto-fill grid.
+       Each card has a percentage, name, sub-tags, and an animated progress bar. -->
+  <section id="skills">
+    <div class="s-label rev">Skills</div>      <!-- Small mono label with cyan line prefix -->
+    <h2 class="s-title rev">What I<br>Know.</h2>  <!-- Section heading -->
+
+    <div class="skills-grid">
+      <!-- data-bar="80" is a custom HTML attribute. JavaScript reads it to set the bar width on scroll. -->
+
+      <div class="sk-card" data-bar="80">
+        <div class="sk-pct">80%</div>              <!-- Large percentage number -->
+        <div class="sk-name">Cybersecurity</div>   <!-- Skill name -->
+        <div class="sk-tags">IAM Fundamentals · IAM Strategy<br>Cyber Forensics · Risk Assessment<br>Deloitte &amp; Tata Certified</div>
+        <!-- Sub-tags listing specific topics. · is a middle-dot separator. -->
+        <div class="bar-w"><div class="bar-f"></div></div>
+        <!-- bar-w = bar wrapper (grey track). bar-f = bar fill (cyan gradient, animated by JS). -->
+      </div>
+
+      <div class="sk-card" data-bar="78">
+        <div class="sk-pct">78%</div>
+        <div class="sk-name">Cloud Computing</div>
+        <div class="sk-tags">Cloud Architecture · Infrastructure<br>NPTEL Certified (IIT Kharagpur)<br>Distributed Systems</div>
+        <div class="bar-w"><div class="bar-f"></div></div>
+      </div>
+
+      <div class="sk-card" data-bar="75">
+        <div class="sk-pct">75%</div>
+        <div class="sk-name">Data Science</div>
+        <div class="sk-tags">Statistical Analysis · ML Basics<br>NPTEL Certified (IIT Madras)<br>Data Wrangling · Engineering</div>
+        <div class="bar-w"><div class="bar-f"></div></div>
+      </div>
+
+      <div class="sk-card" data-bar="72">
+        <div class="sk-pct">72%</div>
+        <div class="sk-name">Web Development</div>
+        <div class="sk-tags">HTML · CSS · JavaScript<br>Google Developer Group Trained<br>Responsive Design</div>
+        <div class="bar-w"><div class="bar-f"></div></div>
+      </div>
+
+      <div class="sk-card" data-bar="85">
+        <div class="sk-pct">85%</div>
+        <div class="sk-name">Design Thinking</div>
+        <div class="sk-tags">IBM Enterprise Design Thinking<br>Practitioner · Co-Creator<br>Team Essentials for AI</div>
+        <div class="bar-w"><div class="bar-f"></div></div>
+      </div>
+
+      <div class="sk-card" data-bar="70">
+        <div class="sk-pct">70%</div>
+        <div class="sk-name">AI &amp; Emerging Tech</div>
+        <div class="sk-tags">ChatGPT · AI Productivity Tools<br>AR / VR · Prompt Engineering<br>be10x Certified</div>
+        <div class="bar-w"><div class="bar-f"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       PROJECTS SECTION
+       Shows GitHub profile strip + project cards grid. -->
+  <section id="projects">
+    <div class="s-label rev">GitHub</div>
+    <h2 class="s-title rev">My<br>Projects.</h2>
+
+    <!-- GitHub profile strip — a mini card with avatar, handle, and a link button -->
+    <div class="gh-strip rev">
+      <div class="gh-avatar">
+        <img src="https://avatars.githubusercontent.com/u/171215790?v=4" alt="Akshat Jain GitHub avatar"/>
+        <!-- Real GitHub avatar pulled from GitHub's CDN using the user's numeric ID. -->
+      </div>
+      <div class="gh-info">
+        <div class="gh-handle">Ak5h4tjain</div>       <!-- GitHub username -->
+        <div class="gh-meta">6 repositories · GitHub</div>  <!-- Repo count label -->
+      </div>
+      <a href="https://github.com/Ak5h4tjain" target="_blank" class="gh-btn">View Profile ↗</a>
+      <!-- target="_blank" opens GitHub in a new tab so the portfolio stays open. -->
+    </div>
+
+    <!-- Project Cards Grid -->
+    <div class="proj-grid">
+
+      <!-- Project 1: NASA API -->
+      <div class="proj-card">
+        <div class="proj-top">
+          <div class="proj-icon">🚀</div>   <!-- Emoji icon for visual flair -->
+          <div class="proj-links">
+            <a href="https://github.com/Ak5h4tjain/NASA_API_PROJECT" target="_blank" class="proj-link">GitHub ↗</a>
+          </div>
+        </div>
+        <div class="proj-name">NASA API Project</div>
+        <div class="proj-desc">A React application that integrates with NASA's public API to display space data — including astronomy pictures of the day, Mars rover imagery, and more.</div>
+        <div class="proj-foot">
+          <!-- lang-dot classes add colored circles before each tech label via CSS ::before pseudo-element -->
+          <span class="lang-dot lang-js">JavaScript 54.6%</span>
+          <span class="lang-dot lang-css">CSS 37%</span>
+          <span class="lang-dot lang-html">HTML 8.4%</span>
+        </div>
+      </div>
+
+      <!-- Project 2: Todo List -->
+      <div class="proj-card">
+        <div class="proj-top">
+          <div class="proj-icon">✅</div>
+          <div class="proj-links">
+            <a href="https://github.com/Ak5h4tjain/Todo-List_project" target="_blank" class="proj-link">GitHub ↗</a>
+          </div>
+        </div>
+        <div class="proj-name">Todo List App</div>
+        <div class="proj-desc">A fully functional React.js Todo List with task creation, completion toggling, and deletion. Demonstrates component-based architecture and React hooks.</div>
+        <div class="proj-foot">
+          <span class="lang-dot lang-js">JavaScript 63.8%</span>
+          <span class="lang-dot lang-css">CSS 21.7%</span>
+          <span class="lang-dot lang-html">HTML 14.5%</span>
+        </div>
+      </div>
+
+      <!-- Project 3: Amazon Clone -->
+      <div class="proj-card">
+        <div class="proj-top">
+          <div class="proj-icon">🛒</div>
+          <div class="proj-links">
+            <a href="https://github.com/Ak5h4tjain/amazon" target="_blank" class="proj-link">GitHub ↗</a>
+          </div>
+        </div>
+        <div class="proj-name">Amazon Clone</div>
+        <div class="proj-desc">A front-end clone of the Amazon e-commerce homepage built with pure HTML and CSS. Replicates navbar, hero banner, product grid, and footer layout.</div>
+        <div class="proj-foot">
+          <span class="lang-dot lang-html">HTML</span>
+          <span class="lang-dot lang-css">CSS</span>
+        </div>
+      </div>
+
+      <!-- Project 4: BMW Listing -->
+      <div class="proj-card">
+        <div class="proj-top">
+          <div class="proj-icon">🚗</div>
+          <div class="proj-links">
+            <a href="https://github.com/Ak5h4tjain/Akshat_Jain33" target="_blank" class="proj-link">GitHub ↗</a>
+          </div>
+        </div>
+        <div class="proj-name">BMW i8 — Car Listing</div>
+        <div class="proj-desc">An HTML/CSS product listing page for a BMW i8 model — showcasing car specifications, pricing layout, and a clean dealership-style UI.</div>
+        <div class="proj-foot">
+          <span class="lang-dot lang-html">HTML</span>
+          <span class="lang-dot lang-css">CSS</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       CERTIFICATIONS SECTION
+       Grid of certification cards, each with issuer, title, date, and topic chips. -->
+  <section id="certs">
+    <div class="s-label rev">Credentials</div>
+    <h2 class="s-title rev">11 Verified<br>Certifications.</h2>
+    <div class="certs-grid">
+
+      <!-- Each .cert-card uses a CSS ::after pseudo-element for the left accent bar on hover. -->
+
+      <div class="cert-card">
+        <div class="cert-badge">🛡</div>         <!-- Icon in top-right corner -->
+        <div class="cert-issuer">Deloitte × Forage</div>  <!-- Issuing organization -->
+        <div class="cert-title">Cyber Job Simulation</div>
+        <div class="cert-date">June 22, 2025 · Verification: NJGvSn59nLKF3jjNv</div>
+        <div class="cert-tags">
+          <!-- .chip = small pill label for a technology/topic -->
+          <span class="chip">Cybersecurity</span>
+          <span class="chip">Job Simulation</span>
+          <span class="chip">Deloitte</span>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-badge">🔐</div>
+        <div class="cert-issuer">Tata Consultancy × Forage</div>
+        <div class="cert-title">Cybersecurity Analyst Job Simulation</div>
+        <div class="cert-date">July 9, 2025 · Verification: JMgeHYyhAdWeC3j2S</div>
+        <div class="cert-tags">
+          <span class="chip">IAM</span><span class="chip">IAM Strategy</span><span class="chip">Platform Integration</span>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-badge">☁️</div>
+        <div class="cert-issuer">NPTEL · IIT Kharagpur</div>
+        <div class="cert-title">Cloud Computing</div>
+        <div class="cert-date">Jul–Oct 2025 · Score: 52% · Roll: NPTEL25CS107S358400459</div>
+        <div class="cert-tags">
+          <span class="chip">Cloud</span><span class="chip">Architecture</span><span class="chip">12-week</span>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-badge">📊</div>
+        <div class="cert-issuer">NPTEL · IIT Madras</div>
+        <div class="cert-title">Data Science for Engineers</div>
+        <div class="cert-date">Jan–Mar 2026 · Score: 51% · Roll: NPTEL26CS65S357600037</div>
+        <div class="cert-tags">
+          <span class="chip">Data Science</span><span class="chip">Statistics</span><span class="chip">8-week</span>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-badge">🎯</div>
+        <div class="cert-issuer">IBM · Credly Verified</div>
+        <div class="cert-title">Enterprise Design Thinking Practitioner</div>
+        <div class="cert-date">April 22, 2025 · Badge: ee3f677c-d492-4bee-930e</div>
+        <div class="cert-tags">
+          <span class="chip">Design Thinking</span><span class="chip">IBM</span><span class="chip">Practitioner</span>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-badge">🤝</div>
+        <div class="cert-issuer">IBM · Credly Verified</div>
+        <div class="cert-title">Enterprise Design Thinking Co-Creator</div>
+        <div class="cert-date">April 29, 2025 · Badge: e8cd2e7b-5998-4ea9-8677</div>
+        <div class="cert-tags">
+          <span class="chip">Design Thinking</span><span class="chip">Co-Creator</span><span class="chip">IBM</span>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-badge">🤖</div>
+        <div class="cert-issuer">IBM · Credly Verified</div>
+        <div class="cert-title">Enterprise Design Thinking — Team Essentials for AI</div>
+        <div class="cert-date">May 7, 2025 · Badge: 2bf15ff7-e93d-41ab-b704</div>
+        <div class="cert-tags">
+          <span class="chip">AI</span><span class="chip">Team Essentials</span><span class="chip">IBM</span>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-badge">🌐</div>
+        <div class="cert-issuer">Google Developer Group · SVVV Campus</div>
+        <div class="cert-title">3-Day Web Development Workshop</div>
+        <div class="cert-date">Feb 17–19, 2025 · GDGOC-SVVV</div>
+        <div class="cert-tags">
+          <span class="chip">HTML/CSS</span><span class="chip">JavaScript</span><span class="chip">Google</span>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-badge">⚡</div>
+        <div class="cert-issuer">be10x</div>
+        <div class="cert-title">AI Tools &amp; ChatGPT Workshop</div>
+        <div class="cert-date">June 29, 2025 · Verified</div>
+        <div class="cert-tags">
+          <span class="chip">AI Tools</span><span class="chip">ChatGPT</span><span class="chip">Productivity</span>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-badge">🥽</div>
+        <div class="cert-issuer">VRadicals India Pvt. Ltd.</div>
+        <div class="cert-title">Augmented Reality &amp; Virtual Reality Seminar</div>
+        <div class="cert-date">September 12, 2024</div>
+        <div class="cert-tags">
+          <span class="chip">AR</span><span class="chip">VR</span><span class="chip">Emerging Tech</span>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <div class="cert-badge">💻</div>
+        <div class="cert-issuer">Great Learning Academy</div>
+        <div class="cert-title">C for Beginners</div>
+        <div class="cert-date">June 2024</div>
+        <div class="cert-tags">
+          <span class="chip">C Programming</span><span class="chip">Fundamentals</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       EDUCATION SECTION -->
+  <section id="education">
+    <div class="s-label rev">Education</div>
+    <h2 class="s-title rev">Where I<br>Study.</h2>
+
+    <div class="edu-card">
+      <!-- edu-dept: degree label in mono cyan font -->
+      <div class="edu-dept">B.Tech · Computer Science &amp; Engineering</div>
+      <!-- edu-univ: large bold university name -->
+      <div class="edu-univ">Shri Vaishnav Institute of Information Technology</div>
+      <!-- edu-loc: location in italic muted text -->
+      <div class="edu-loc">Shri Vaishnav Vidyapeeth Vishwavidyalaya · Indore, Madhya Pradesh, India</div>
+      <!-- Reusing .cert-tags style for the topic chips -->
+      <div class="cert-tags">
+        <span class="chip">Computer Science</span>
+        <span class="chip">Data Structures</span>
+        <span class="chip">Algorithms</span>
+        <span class="chip">Cloud Computing</span>
+        <span class="chip">Data Science</span>
+        <span class="chip">SVIIT Indore</span>
+      </div>
+      <!-- Decorative background text — huge, very faint, purely visual -->
+      <div class="edu-year-bg">SVIIT</div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       CONTACT SECTION -->
+  <section id="contact">
+    <!-- c-bg-txt: giant decorative "AJ" initials in the background -->
+    <div class="c-bg-txt">AJ</div>
+
+    <div class="c-wrap rev">
+      <!-- Section label, centered via inline style -->
+      <div class="s-label" style="justify-content:center">Let's Connect</div>
+
+      <!-- Main heading with cyan gradient on "Akshat" -->
+      <h2 class="c-big">Hire <span class="cg">Akshat</span><br>Today.</h2>
+
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:.5rem">
+        Open to internships, projects &amp; collaborations
+      </p>
+
+      <!-- Mailto link — clicking opens the user's default email app -->
+      <a href="mailto:akshatkumarjain111198120@gmail.com" class="c-email">
+        akshatkumarjain111198120@gmail.com
+      </a>
+
+      <!-- Social links row -->
+      <div class="socials">
+        <a href="https://www.linkedin.com/in/akshat-jain-648a24283/" target="_blank" class="soc">LinkedIn ↗</a>
+        <a href="https://github.com/Ak5h4tjain" target="_blank" class="soc">GitHub ↗</a>
+        <a href="#" class="soc">Twitter</a>
+        <!-- href="#" is a placeholder — Twitter link not yet added. -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       FOOTER -->
+  <footer>
+    <span>© 2026 Akshat Jain · SVIIT, Indore</span>
+    <span>Built with Three.js + ♥</span>
+    <!-- ♥ is the HTML entity for the heart symbol ♥ -->
+  </footer>
+
+  <!-- External JS files loaded at the bottom so HTML renders first -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>

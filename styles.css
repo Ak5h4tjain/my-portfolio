@@ -1,0 +1,1053 @@
+/* ════════════════════════════════════════════════════════
+   GLOBAL RESET
+   ════════════════════════════════════════════════════════ */
+
+*,*::before,*::after {
+  box-sizing: border-box; /* Makes padding/border included in element width — prevents layout overflow */
+  margin: 0;              /* Removes default browser margins from all elements */
+  padding: 0;             /* Removes default browser padding from all elements */
+}
+
+html {
+  scroll-behavior: smooth; /* Clicking nav anchor links scrolls smoothly instead of jumping */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   CSS CUSTOM PROPERTIES (Design Tokens / Variables)
+   Defined on :root so they are globally accessible.
+   Usage: var(--name)
+   ════════════════════════════════════════════════════════ */
+:root {
+  --bg:     #04060f;               /* Near-black dark navy — main page background */
+  --cyan:   #00e5ff;               /* Electric cyan — primary accent / brand color */
+  --blue:   #5468ff;               /* Indigo blue — secondary accent, used in gradients */
+  --pink:   #f72585;               /* Hot pink — tertiary accent, cursor ring on hover */
+  --gold:   #ffd166;               /* Gold — defined but not heavily used (reserved) */
+  --text:   #e8f4fd;               /* Off-white — main readable text color */
+  --muted:  #4a6a8a;               /* Blue-grey — less important text (labels, dates, metas) */
+  --glass:  rgba(255,255,255,0.035); /* Nearly transparent white for card backgrounds */
+  --border: rgba(0,229,255,0.10);  /* Subtle cyan border — gives cards a faint glow edge */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   BODY
+   ════════════════════════════════════════════════════════ */
+body {
+  background:    var(--bg);              /* Dark background set globally */
+  color:         var(--text);            /* Default text color for entire page */
+  font-family:   'Syne', sans-serif;     /* Custom Google Font; sans-serif is fallback */
+  font-weight:   400;                    /* Normal weight as default */
+  overflow-x:    hidden;                 /* Prevents horizontal scrollbar from 3D objects */
+  cursor:        none;                   /* Hides the OS default cursor — custom cursor is used */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   CUSTOM CURSOR
+   Two overlapping circles replace the mouse pointer.
+   ════════════════════════════════════════════════════════ */
+#cur {
+  width:          8px;             /* Small dot size */
+  height:         8px;
+  background:     var(--cyan);     /* Filled cyan dot */
+  border-radius:  50%;             /* Circle shape */
+  position:       fixed;           /* Stays on screen regardless of scroll */
+  pointer-events: none;            /* Doesn't block clicks on elements underneath */
+  z-index:        9999;            /* Above everything else */
+  transform:      translate(-50%, -50%); /* Centers dot on exact mouse coordinates */
+  box-shadow:     0 0 14px var(--cyan);  /* Cyan glow halo */
+}
+
+#cur-r {
+  width:          30px;            /* Larger ring (outer circle) */
+  height:         30px;
+  border:         1px solid rgba(0,229,255,.4); /* Faint cyan border only — hollow center */
+  border-radius:  50%;
+  position:       fixed;
+  pointer-events: none;
+  z-index:        9998;            /* Just below the dot */
+  transform:      translate(-50%, -50%);
+  transition:     width .25s, height .25s, border-color .25s; /* Smooth expansion on hover */
+}
+
+/* When body contains a hovered link: the ring expands and turns pink */
+body:has(a:hover) #cur-r {
+  width:        50px;            /* Grows bigger */
+  height:       50px;
+  border-color: var(--pink);     /* Pink ring on link hover — indicates clickable */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   THREE.JS BACKGROUND CANVAS
+   ════════════════════════════════════════════════════════ */
+#bg {
+  position:       fixed;   /* Fixed so it doesn't scroll with the page */
+  inset:          0;       /* Shorthand for top:0; right:0; bottom:0; left:0 — fills the whole screen */
+  z-index:        0;       /* Sits behind all page content */
+  pointer-events: none;    /* Mouse clicks pass through it to content below */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   LOADER / SPLASH SCREEN
+   ════════════════════════════════════════════════════════ */
+#ldr {
+  position:        fixed;           /* Covers entire viewport */
+  inset:           0;
+  background:      var(--bg);       /* Same dark background */
+  z-index:         9000;            /* Very high — sits above all content but below cursor */
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-direction:  column;          /* Stack children vertically */
+  gap:             2rem;            /* Space between spinner, name, and text */
+  transition:      opacity .8s, visibility .8s; /* Fade out when .out class is added */
+}
+
+#ldr.out {
+  opacity:    0;        /* Become transparent */
+  visibility: hidden;   /* Also hide from screen readers and interaction */
+}
+
+/* Spinning ring animation for the loader */
+.ldr-ring {
+  width:         56px;
+  height:        56px;
+  border:        1px solid var(--border);       /* Faint full border */
+  border-top-color: var(--cyan);                /* Top side is bright cyan — creates spinning effect */
+  border-radius: 50%;
+  animation:     spin 1s linear infinite;       /* Continuous rotation */
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); } /* Full circle — pairs with linear infinite for smooth spin */
+}
+
+/* "Loading Portfolio" text that blinks */
+.ldr-txt {
+  font-family:    'Syne Mono', monospace;
+  font-size:      .72rem;
+  letter-spacing: .3em;            /* Wide spacing for techy look */
+  color:          var(--cyan);
+  text-transform: uppercase;
+  animation:      blink 1.2s ease infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }   /* Fully visible at start and end */
+  50%       { opacity: .25; } /* Nearly invisible at midpoint — creates blinking */
+}
+
+/* "Akshat Jain" name displayed faintly during load */
+.ldr-name {
+  font-size:      1.1rem;
+  font-weight:    800;
+  letter-spacing: .15em;
+  color:          rgba(255,255,255,.12); /* Very faint — almost invisible */
+  text-transform: uppercase;
+}
+
+
+/* ════════════════════════════════════════════════════════
+   NAVIGATION BAR
+   ════════════════════════════════════════════════════════ */
+nav {
+  position:           fixed;                   /* Stays at top while scrolling */
+  top: 0; left: 0; right: 0;
+  padding:            1.3rem 5vw;              /* 5vw = responsive side padding */
+  display:            flex;
+  justify-content:    space-between;           /* Logo on left, links on right */
+  align-items:        center;
+  z-index:            100;
+  border-bottom:      1px solid var(--border); /* Subtle bottom line */
+  background:         rgba(4,6,15,.75);        /* Semi-transparent dark bg */
+  backdrop-filter:    blur(20px);              /* Frosted glass blur effect on content behind */
+  -webkit-backdrop-filter: blur(20px);         /* Safari prefix for backdrop-filter */
+}
+
+.nav-logo {
+  font-size:       1.05rem;
+  font-weight:     800;
+  letter-spacing:  .08em;
+  color:           var(--cyan);
+  text-decoration: none;                         /* Removes underline from link */
+  text-shadow:     0 0 18px rgba(0,229,255,.5);  /* Glowing effect around logo text */
+}
+
+.nav-links {
+  display:    flex;
+  gap:        2rem;     /* Space between nav items */
+  list-style: none;     /* Removes bullet points from <ul> */
+}
+
+.nav-links a {
+  font-family:     'Syne Mono', monospace;
+  font-size:       .65rem;
+  letter-spacing:  .18em;
+  text-transform:  uppercase;
+  color:           var(--muted);     /* Dim by default */
+  text-decoration: none;
+  transition:      color .2s;        /* Smooth color change on hover */
+}
+
+.nav-links a:hover {
+  color: var(--cyan); /* Brightens to cyan on hover */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   SECTIONS (shared base styles)
+   ════════════════════════════════════════════════════════ */
+section {
+  position: relative; /* Needed for absolutely positioned children inside sections */
+  z-index:  10;       /* Above the fixed 3D canvas (z-index:0) */
+  padding:  9rem 5vw; /* Generous vertical padding + responsive sides */
+}
+
+/* Small label above each section heading (e.g. "Skills", "GitHub") */
+.s-label {
+  font-family:     'Syne Mono', monospace;
+  font-size:       .65rem;
+  letter-spacing:  .25em;
+  text-transform:  uppercase;
+  color:           var(--cyan);
+  margin-bottom:   .8rem;
+  display:         flex;
+  align-items:     center;
+  gap:             1rem;
+}
+
+/* Cyan line drawn before the label using a pseudo-element */
+.s-label::before {
+  content:    '';           /* Required for pseudo-elements to render */
+  display:    inline-block;
+  width:      28px;
+  height:     1px;
+  background: var(--cyan);
+  box-shadow: 0 0 6px var(--cyan); /* Line has a subtle glow */
+}
+
+/* Large section headings (e.g. "What I Know.") */
+.s-title {
+  font-size:     clamp(2.2rem, 5vw, 4rem); /* Responsive: min 2.2rem, preferred 5vw, max 4rem */
+  font-weight:   800;
+  line-height:   .95;        /* Tight line spacing for big headings */
+  letter-spacing: -.03em;   /* Negative tracking for modern tight look */
+  margin-bottom: 4rem;
+}
+
+
+/* ════════════════════════════════════════════════════════
+   HERO SECTION
+   ════════════════════════════════════════════════════════ */
+#hero {
+  min-height:     100vh;  /* At least full viewport height */
+  display:        flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center content */
+  padding-top:    100px;   /* Offset for fixed nav bar height */
+}
+
+.hero-inner {
+  max-width: 700px; /* Constrains text to readable width on large screens */
+}
+
+/* Status badge: "Open to internships..." */
+.hero-badge {
+  font-family:    'Syne Mono', monospace;
+  font-size:      .7rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color:          var(--cyan);
+  margin-bottom:  2rem;
+  display:        inline-flex;
+  align-items:    center;
+  gap:            .8rem;
+  border:         1px solid var(--border);
+  padding:        .4rem 1rem;
+  background:     rgba(0,229,255,.04); /* Almost invisible cyan tint */
+}
+
+/* Pulsing green/cyan dot inside the badge */
+.pulse {
+  width:         6px;
+  height:        6px;
+  background:    var(--cyan);
+  border-radius: 50%;
+  animation:     pulse 2s ease infinite;
+  box-shadow:    0 0 6px var(--cyan);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.7); opacity: .4; } /* Grows and fades at midpoint */
+}
+
+/* Giant name heading */
+.hero-name {
+  font-size:      clamp(3.5rem, 9vw, 8.5rem); /* Scales with viewport */
+  font-weight:    800;
+  line-height:    .88;        /* Very tight — name feels like a logo */
+  letter-spacing: -.04em;
+  margin-bottom:  .15em;
+}
+
+/* The cyan-colored "JAIN." span */
+.hero-name .c {
+  color:       var(--cyan);
+  text-shadow: 0 0 50px rgba(0,229,255,.35), /* Wide soft glow */
+               0 0 100px rgba(0,229,255,.12); /* Even wider, subtler outer glow */
+}
+
+/* "CS Student / Developer / ..." role line */
+.hero-role {
+  font-family:    'Syne Mono', monospace;
+  font-size:      clamp(.85rem, 1.6vw, 1.1rem);
+  color:          var(--muted);
+  letter-spacing: .1em;
+  margin:         1.5rem 0 2rem;
+}
+
+.hero-role span {
+  color: var(--cyan); /* The "/" separators are cyan */
+}
+
+/* Bio paragraph */
+.hero-desc {
+  font-size:     .95rem;
+  line-height:   1.95;        /* Extra line-height for comfortable reading */
+  color:         #6a8aa8;     /* Specific blue-grey shade for body text */
+  max-width:     460px;
+  margin-bottom: 3rem;
+}
+
+/* Stats row container */
+.hero-stats {
+  display:       flex;
+  gap:           3rem;
+  margin-bottom: 3rem;
+  flex-wrap:     wrap; /* Wraps to next line on small screens */
+}
+
+/* Large stat number (11, 6, 6+) */
+.hstat-n {
+  font-size:   2.2rem;
+  font-weight: 800;
+  color:       var(--cyan);
+  text-shadow: 0 0 20px rgba(0,229,255,.3);
+  line-height: 1;
+}
+
+/* Small stat label below the number */
+.hstat-l {
+  font-family:    'Syne Mono', monospace;
+  font-size:      .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color:          var(--muted);
+  margin-top:     .2rem;
+}
+
+/* CTA buttons container */
+.hero-ctas {
+  display:   flex;
+  gap:       1rem;
+  flex-wrap: wrap;
+}
+
+/* Base button styles shared by both button types */
+.btn {
+  padding:        .82rem 2rem;
+  font-family:    'Syne Mono', monospace;
+  font-size:      .68rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  text-decoration: none;
+  display:        inline-flex;
+  align-items:    center;
+  gap:            .5rem;
+  transition:     all .3s;
+  cursor:         none; /* Uses custom cursor, not browser default */
+  border:         none;
+}
+
+/* Primary filled button — "Get in Touch" */
+.btn-glow {
+  background:  var(--cyan);
+  color:       #04060f;          /* Dark text on bright background */
+  box-shadow:  0 0 20px rgba(0,229,255,.3);
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 35px rgba(0,229,255,.6); /* More intense glow on hover */
+  transform:  translateY(-2px);            /* Subtle lift effect */
+}
+
+/* Secondary ghost button — "View Certs" */
+.btn-ghost {
+  background: transparent;
+  color:      var(--text);
+  border:     1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  border-color: var(--cyan);
+  color:        var(--cyan);
+}
+
+/* "Scroll to explore" hint at bottom of hero */
+.scroll-hint {
+  position:       absolute;
+  bottom:         3rem;
+  left:           5vw;
+  font-family:    'Syne Mono', monospace;
+  font-size:      .62rem;
+  letter-spacing: .2em;
+  color:          var(--muted);
+  display:        flex;
+  align-items:    center;
+  gap:            1rem;
+  text-transform: uppercase;
+}
+
+/* Animated expanding/contracting cyan line before "Scroll to explore" */
+.s-line-anim {
+  width:      0;
+  height:     1px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
+  animation:  sla 2s ease infinite;
+}
+
+@keyframes sla {
+  0%   { width: 0;    opacity: 0; }
+  60%  { width: 40px; opacity: 1; } /* Grows to 40px at 60% */
+  100% { width: 0;    opacity: 0; } /* Shrinks back to 0 */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   SKILLS SECTION
+   ════════════════════════════════════════════════════════ */
+#skills {
+  background: rgba(0,0,0,.25); /* Slightly darker overlay to distinguish from hero */
+}
+
+/* Responsive grid — auto-fills columns, each at least 240px wide */
+.skills-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap:                   1.4rem;
+}
+
+/* Each skill card */
+.sk-card {
+  background:  var(--glass);    /* Frosted glass dark background */
+  border:      1px solid var(--border);
+  padding:     1.8rem;
+  position:    relative;
+  overflow:    hidden;           /* Clips the ::before line animation at card edges */
+  transition:  border-color .3s, box-shadow .3s, transform .3s;
+  opacity:     0;               /* Invisible by default — JS adds .vis to reveal */
+  transform:   translateY(28px); /* Starts shifted down — JS animates it up */
+}
+
+/* When JavaScript adds .vis (element enters viewport) */
+.sk-card.vis {
+  opacity:   1;
+  transform: translateY(0);
+  transition: opacity .55s, transform .55s, border-color .3s, box-shadow .3s;
+}
+
+.sk-card:hover {
+  border-color: rgba(0,229,255,.35);
+  box-shadow:   0 0 28px rgba(0,229,255,.07);
+  transform:    translateY(-6px) !important; /* !important overrides the .vis transform */
+}
+
+/* Top edge highlight line that expands on hover */
+.sk-card::before {
+  content:    '';
+  position:   absolute;
+  top: 0; left: 0; right: 0;
+  height:     1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  transform:  scaleX(0);        /* Collapsed by default */
+  transition: transform .5s;
+}
+
+.sk-card:hover::before {
+  transform: scaleX(1); /* Expands to full width on hover */
+}
+
+/* Big percentage number on card */
+.sk-pct {
+  font-size:   2.6rem;
+  font-weight: 800;
+  color:       var(--cyan);
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(0,229,255,.25);
+  margin-bottom: .25rem;
+}
+
+.sk-name {
+  font-size:     1rem;
+  font-weight:   700;
+  margin-bottom: .35rem;
+}
+
+/* Small mono tags listing sub-skills */
+.sk-tags {
+  font-family:    'Syne Mono', monospace;
+  font-size:      .62rem;
+  color:          var(--muted);
+  letter-spacing: .05em;
+  line-height:    1.9;
+}
+
+/* Progress bar container (grey track) */
+.bar-w {
+  margin-top: 1.1rem;
+  height:     2px;
+  background: rgba(255,255,255,.05); /* Barely visible grey track */
+  overflow:   hidden;
+}
+
+/* Progress bar fill — JS sets the width based on data-bar attribute */
+.bar-f {
+  height:     100%;
+  background: linear-gradient(90deg, var(--cyan), var(--blue)); /* Cyan → blue gradient */
+  width:      0;     /* Starts at 0, JS animates to target % */
+  transition: width 1.2s cubic-bezier(.16,1,.3,1); /* Springy easing (ease-out-expo) */
+  box-shadow: 0 0 8px var(--cyan);
+}
+
+
+/* ════════════════════════════════════════════════════════
+   CERTIFICATIONS SECTION
+   ════════════════════════════════════════════════════════ */
+#certs {
+  position: relative; /* Needed for absolutely-positioned children */
+}
+
+.certs-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap:                   1.4rem;
+}
+
+.cert-card {
+  background:  var(--glass);
+  border:      1px solid var(--border);
+  padding:     2rem;
+  position:    relative;
+  overflow:    hidden;
+  transition:  border-color .3s, transform .3s, box-shadow .3s;
+  opacity:     0;
+  transform:   translateX(-20px); /* Slides in from left (vs skill cards which slide from bottom) */
+}
+
+.cert-card.vis {
+  opacity:   1;
+  transform: translateX(0);
+  transition: opacity .5s, transform .5s, border-color .3s;
+}
+
+.cert-card:hover {
+  border-color: rgba(0,229,255,.35);
+  transform:    translateY(-5px) !important;
+  box-shadow:   0 0 30px rgba(0,229,255,.06);
+}
+
+/* Left edge vertical bar that scales down from top on hover */
+.cert-card::after {
+  content:          '';
+  position:         absolute;
+  left: 0; top: 0; bottom: 0;
+  width:            2px;
+  background:       linear-gradient(to bottom, var(--cyan), var(--blue));
+  transform:        scaleY(0);       /* Invisible by default */
+  transform-origin: top;             /* Grows downward from top */
+  transition:       transform .45s;
+}
+
+.cert-card:hover::after {
+  transform: scaleY(1); /* Full height on hover */
+}
+
+/* Issuer name (e.g. "Deloitte × Forage") */
+.cert-issuer {
+  font-family:    'Syne Mono', monospace;
+  font-size:      .62rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color:          var(--cyan);
+  margin-bottom:  .5rem;
+}
+
+.cert-title {
+  font-size:     1rem;
+  font-weight:   700;
+  line-height:   1.3;
+  margin-bottom: .4rem;
+}
+
+.cert-date {
+  font-family:    'Syne Mono', monospace;
+  font-size:      .6rem;
+  letter-spacing: .1em;
+  color:          var(--muted);
+  margin-bottom:  1rem;
+}
+
+/* Tag chips row */
+.cert-tags {
+  display:   flex;
+  flex-wrap: wrap;
+  gap:       .4rem;
+}
+
+/* Individual chip/pill tag */
+.chip {
+  font-family:    'Syne Mono', monospace;
+  font-size:      .58rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding:        .25rem .6rem;
+  border:         1px solid var(--border);
+  color:          var(--muted);
+  transition:     all .2s;
+}
+
+.chip:hover {
+  border-color: var(--cyan);
+  color:        var(--cyan);
+}
+
+/* Circular icon/emoji in top-right corner of cert cards */
+.cert-badge {
+  position:        absolute;
+  top: 1.5rem; right: 1.5rem;
+  width:           34px;
+  height:          34px;
+  border-radius:   50%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       1rem;
+  border:          1px solid var(--border);
+  background:      rgba(0,0,0,.3);
+}
+
+
+/* ════════════════════════════════════════════════════════
+   EDUCATION SECTION
+   ════════════════════════════════════════════════════════ */
+#education {
+  background: rgba(0,0,0,.2); /* Slightly darker than default */
+}
+
+.edu-card {
+  background:  var(--glass);
+  border:      1px solid var(--border);
+  padding:     2.5rem;
+  position:    relative;
+  overflow:    hidden;
+  max-width:   700px;
+  opacity:     0;
+  transform:   translateY(25px);
+}
+
+.edu-card.vis {
+  opacity:   1;
+  transform: translateY(0);
+  transition: opacity .6s, transform .6s;
+}
+
+/* Decorative radial gradient in the top-right of the education card */
+.edu-card::before {
+  content:        '';
+  position:       absolute;
+  top: -80%; right: -20%;
+  width:          300px;
+  height:         300px;
+  border-radius:  50%;
+  background:     radial-gradient(circle, rgba(0,229,255,.04), transparent 70%);
+  pointer-events: none; /* Doesn't interfere with interaction */
+}
+
+.edu-univ {
+  font-size:     1.5rem;
+  font-weight:   800;
+  margin-bottom: .3rem;
+  line-height:   1.2;
+}
+
+.edu-dept {
+  font-family:    'Syne Mono', monospace;
+  font-size:      .68rem;
+  letter-spacing: .15em;
+  color:          var(--cyan);
+  margin-bottom:  .5rem;
+  text-transform: uppercase;
+}
+
+.edu-loc {
+  font-size:     .85rem;
+  color:         var(--muted);
+  font-style:    italic;
+  margin-bottom: 1.5rem;
+}
+
+/* Huge decorative watermark-style "SVIIT" text */
+.edu-year-bg {
+  position:        absolute;
+  bottom: .5rem; right: 2rem;
+  font-size:       5rem;
+  font-weight:     800;
+  color:           rgba(0,229,255,.04); /* Nearly invisible */
+  line-height:     1;
+  pointer-events:  none; /* Non-interactive decoration */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   CONTACT SECTION
+   ════════════════════════════════════════════════════════ */
+#contact {
+  min-height:      70vh;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  text-align:      center;
+}
+
+.c-wrap {
+  position: relative;
+  z-index:  2;       /* Above the decorative "AJ" background text */
+  width:    100%;
+}
+
+/* Huge heading "Hire Akshat Today." */
+.c-big {
+  font-size:      clamp(2.8rem, 9vw, 8rem);
+  font-weight:    800;
+  letter-spacing: -.04em;
+  line-height:    .9;
+  margin-bottom:  1.5rem;
+}
+
+/* "Akshat" in cyan with glow */
+.c-big .cg {
+  color:       var(--cyan);
+  text-shadow: 0 0 60px rgba(0,229,255,.35);
+}
+
+/* Email link */
+.c-email {
+  font-family:     'Syne Mono', monospace;
+  font-size:       .95rem;
+  color:           var(--muted);
+  text-decoration: none;
+  letter-spacing:  .06em;
+  display:         inline-block;
+  margin:          1.5rem 0 2.5rem;
+  border-bottom:   1px solid var(--border); /* Underline only at bottom */
+  padding-bottom:  3px;
+  transition:      color .2s, border-color .2s;
+}
+
+.c-email:hover {
+  color:        var(--cyan);
+  border-color: var(--cyan);
+}
+
+/* Social links row */
+.socials {
+  display:         flex;
+  justify-content: center;
+  gap:             1.2rem;
+  flex-wrap:       wrap;
+}
+
+/* Individual social link button */
+.soc {
+  font-family:     'Syne Mono', monospace;
+  font-size:       .65rem;
+  letter-spacing:  .15em;
+  text-transform:  uppercase;
+  color:           var(--muted);
+  text-decoration: none;
+  border:          1px solid var(--border);
+  padding:         .5rem 1.1rem;
+  transition:      all .25s;
+}
+
+.soc:hover {
+  border-color: var(--cyan);
+  color:        var(--cyan);
+  box-shadow:   0 0 18px rgba(0,229,255,.12);
+}
+
+/* Huge faint "AJ" decorative background text */
+.c-bg-txt {
+  position:   absolute;
+  font-size:  25vw;
+  font-weight: 800;
+  color:      rgba(0,229,255,.018); /* Barely perceptible tint */
+  pointer-events: none;
+  user-select: none; /* Can't be selected/copied by user */
+  line-height: 1;
+  z-index:    1;
+  top: 50%; left: 50%;
+  transform:  translate(-50%, -50%); /* Centered absolutely */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   FOOTER
+   ════════════════════════════════════════════════════════ */
+footer {
+  padding:         1.8rem 5vw;
+  border-top:      1px solid var(--border);
+  display:         flex;
+  justify-content: space-between; /* Copyright on left, credit on right */
+  align-items:     center;
+  font-family:     'Syne Mono', monospace;
+  font-size:       .6rem;
+  color:           var(--muted);
+  letter-spacing:  .1em;
+  position:        relative;
+  z-index:         10; /* Above the 3D canvas */
+}
+
+
+/* ════════════════════════════════════════════════════════
+   SCROLL REVEAL ANIMATION
+   Elements start invisible and shift up, then become visible
+   when JavaScript adds the .vis class via IntersectionObserver.
+   ════════════════════════════════════════════════════════ */
+.rev {
+  opacity:    0;
+  transform:  translateY(18px);
+  transition: opacity .65s, transform .65s;
+}
+
+.rev.vis {
+  opacity:   1;
+  transform: translateY(0);
+}
+
+
+/* ════════════════════════════════════════════════════════
+   PROJECTS SECTION
+   ════════════════════════════════════════════════════════ */
+#projects {
+  background: rgba(0,0,0,.28);
+}
+
+.proj-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap:                   1.5rem;
+}
+
+.proj-card {
+  background:     var(--glass);
+  border:         1px solid var(--border);
+  padding:        2.2rem;
+  position:       relative;
+  overflow:       hidden;
+  transition:     border-color .3s, transform .3s, box-shadow .3s;
+  opacity:        0;
+  transform:      translateY(28px);
+  display:        flex;
+  flex-direction: column;
+  gap:            1rem;
+}
+
+.proj-card.vis {
+  opacity:   1;
+  transform: translateY(0);
+  transition: opacity .55s, transform .55s, border-color .3s;
+}
+
+.proj-card:hover {
+  border-color: rgba(0,229,255,.38);
+  transform:    translateY(-7px) !important;
+  box-shadow:   0 0 35px rgba(0,229,255,.07), inset 0 0 30px rgba(0,229,255,.02);
+  /* inset shadow adds a subtle inner glow on hover */
+}
+
+/* Top edge rainbow gradient line that sweeps in from left on hover */
+.proj-card::before {
+  content:          '';
+  position:         absolute;
+  top: 0; left: 0; right: 0;
+  height:           2px;
+  background:       linear-gradient(90deg, var(--cyan), var(--blue), var(--pink));
+  transform:        scaleX(0);
+  transform-origin: left;  /* Sweeps from left to right */
+  transition:       transform .5s;
+}
+
+.proj-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* Top area of card: emoji icon + GitHub link */
+.proj-top {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     flex-start;
+}
+
+.proj-icon {
+  font-size:   1.6rem;
+  line-height: 1;
+}
+
+.proj-links {
+  display: flex;
+  gap:     .6rem;
+}
+
+/* Small "GitHub ↗" link button */
+.proj-link {
+  font-family:     'Syne Mono', monospace;
+  font-size:       .6rem;
+  letter-spacing:  .12em;
+  text-transform:  uppercase;
+  color:           var(--muted);
+  text-decoration: none;
+  border:          1px solid var(--border);
+  padding:         .28rem .65rem;
+  transition:      all .2s;
+}
+
+.proj-link:hover {
+  color:        var(--cyan);
+  border-color: var(--cyan);
+  box-shadow:   0 0 10px rgba(0,229,255,.2);
+}
+
+.proj-name {
+  font-size:      1.15rem;
+  font-weight:    800;
+  letter-spacing: -.01em;
+  line-height:    1.2;
+}
+
+.proj-desc {
+  font-size:   .85rem;
+  line-height: 1.85;
+  color:       #6a8aa8;
+  flex:        1; /* Takes remaining space in the flex column card */
+}
+
+.proj-foot {
+  display:    flex;
+  flex-wrap:  wrap;
+  gap:        .4rem;
+  margin-top: auto; /* Pushes to bottom of the card */
+}
+
+/* Language dots with colored circles before them */
+.lang-dot {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            .35rem;
+  font-family:    'Syne Mono', monospace;
+  font-size:      .6rem;
+  letter-spacing: .08em;
+  color:          var(--muted);
+}
+
+/* The colored dot is a CSS ::before pseudo-element circle */
+.lang-dot::before {
+  content:       '';
+  display:       inline-block;
+  width:         8px;
+  height:        8px;
+  border-radius: 50%;
+}
+
+/* Each language gets its official brand color */
+.lang-js::before   { background: #f7df1e; }  /* JavaScript yellow */
+.lang-html::before { background: #e34c26; }  /* HTML orange-red */
+.lang-css::before  { background: #264de4; }  /* CSS blue */
+.lang-react::before{ background: #61dafb; }  /* React cyan */
+
+
+/* ════════════════════════════════════════════════════════
+   GITHUB PROFILE STRIP
+   ════════════════════════════════════════════════════════ */
+.gh-strip {
+  display:       flex;
+  align-items:   center;
+  gap:           1rem;
+  margin-bottom: 3rem;
+  padding:       1.5rem 2rem;
+  border:        1px solid var(--border);
+  background:    var(--glass);
+  max-width:     500px;
+}
+
+.gh-avatar {
+  width:      52px;
+  height:     52px;
+  border-radius: 0; /* Square avatar — intentional sharp corners for the aesthetic */
+  border:     1px solid var(--border);
+  overflow:   hidden; /* Clips the img to the div's shape */
+}
+
+.gh-avatar img {
+  width:      100%;
+  height:     100%;
+  object-fit: cover; /* Fills the container without distortion */
+}
+
+.gh-handle {
+  font-weight:   800;
+  font-size:     1rem;
+  margin-bottom: .15rem;
+}
+
+.gh-meta {
+  font-family:    'Syne Mono', monospace;
+  font-size:      .62rem;
+  letter-spacing: .1em;
+  color:          var(--cyan);
+}
+
+.gh-btn {
+  margin-left:    auto;            /* Pushes button to far right within the flex row */
+  font-family:    'Syne Mono', monospace;
+  font-size:      .62rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color:          var(--bg);       /* Dark text on cyan button */
+  background:     var(--cyan);
+  text-decoration: none;
+  padding:        .5rem 1rem;
+  white-space:    nowrap;          /* Prevents text from wrapping */
+  transition:     box-shadow .2s;
+}
+
+.gh-btn:hover {
+  box-shadow: 0 0 20px rgba(0,229,255,.5);
+}
+
+
+/* ════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE (max-width: 768px)
+   ════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  body       { cursor: auto; }     /* Restore normal cursor on touch devices */
+  #cur,
+  #cur-r     { display: none; }    /* Hide custom cursor elements on mobile */
+  .nav-links { display: none; }    /* Hide nav links (no hamburger menu implemented) */
+  .hero-stats{ gap: 2rem; }        /* Tighter gap in the stats row on smaller screens */
+}
