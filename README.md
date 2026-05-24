@@ -127,7 +127,7 @@ my-portfolio/
 
 | Desktop View | Mobile View |
 |:---:|:---:|
-| ![Desktop](https://github.com/Ak5h4tjain/my-portfolio/blob/main/assets%2Fimages%2FScreenshot%202026-05-23%20233227.jpg) | ![Mobile]() |
+| ![Desktop](https://github.com/Ak5h4tjain/my-portfolio/blob/main/assets%2Fimages%2FScreenshot%202026-05-23%20233227.jpg) | ![Mobile](https://github.com/Ak5h4tjain/my-portfolio/blob/main/assets%2Fimages%2FWhatsApp%20Image%202026-05-23%20at%2011.51.05%20PM.jpeg) |
 
 </div>
 
