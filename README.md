@@ -12,7 +12,7 @@
 
 ![Portfolio Preview](https://github.com/Ak5h4tjain/my-portfolio/blob/main/assets%2Fimages%2FScreenshot%202026-05-23%20233227.jpg)
 
-> *"Replace this with your favorite quote or your personal tagline."*
+> *"Curious by nature. Certified by discipline. Ready to build."*
 
 </div>
 
