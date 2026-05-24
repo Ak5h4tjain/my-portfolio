@@ -10,7 +10,7 @@
 
 <br/>
 
-![Portfolio Preview](assets/images/Screenshot 2026-05-23 233227.jpg)
+![Portfolio Preview](https://github.com/Ak5h4tjain/my-portfolio/blob/main/assets%2Fimages%2FScreenshot%202026-05-23%20233227.jpg)
 
 > *"Replace this with your favorite quote or your personal tagline."*
 
@@ -127,7 +127,7 @@ my-portfolio/
 
 | Desktop View | Mobile View |
 |:---:|:---:|
-| ![Desktop](assets/images/Screenshot 2026-05-23 233227.jpg) | ![Mobile](assets/images/WhatsApp Image 2026-05-23 at 11.51.05 PM.jpeg) |
+| ![Desktop](https://github.com/Ak5h4tjain/my-portfolio/blob/main/assets%2Fimages%2FScreenshot%202026-05-23%20233227.jpg) | ![Mobile]() |
 
 </div>
 
