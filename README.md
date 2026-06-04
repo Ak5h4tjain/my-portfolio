@@ -136,7 +136,7 @@ my-portfolio/
 ---
 
 ## 📄 Resume
-[![Download Resume](https://img.shields.io/badge/Download-Resume_PDF-blue?style=for-the-badge&logo=adobeacrobatreader)](assets/Akshat_Jain_Resume.pdf)
+[![Download Resume](https://img.shields.io/badge/Download-Resume_PDF-blue?style=for-the-badge&logo=adobeacrobatreader)](https://github.com/Ak5h4tjain/my-portfolio/blob/main/assets%2FAkshat_Jain_Resume.pdf)
 
 ---
 
